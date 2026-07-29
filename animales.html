@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rancho Alejandro - Registro de Animales</title>
+    
+    <!-- Estilos Globales -->
+    <link rel="stylesheet" href="css/global.css">
+    <!-- Estilos de esta sección -->
+    <link rel="stylesheet" href="css/animales.css">
+</head>
+<body>
+
+    <div class="contenedor-principal">
+
+        <!-- --- MENÚ LATERAL / BANNER (Mantiene el mismo diseño) --- -->
+        <aside class="sidebar">
+            <div class="banner-contenedor">
+                <img src="assets/logo.png" alt="Registro de Ganado - Rancho Alejandro" class="imagen-banner" onerror="this.src='https://via.placeholder.com/280x600?text=RANCHO+ALEJANDRO'">
+            </div>
+
+            <footer class="sidebar-footer">
+                <p>🛡️ Sistema de Control Ganadero - Rancho Alejandro</p>
+            </footer>
+        </aside>
+
+        <!-- --- CONTENIDO DE REGISTRO DE ANIMALES --- -->
+        <main class="contenido">
+            
+            <!-- Header con botón Volver -->
+            <header class="top-bar">
+                <a href="index.html" class="btn-volver">← Volver al Inicio</a>
+                <div class="usuario-info">
+                    <div class="avatar-placeholder"></div>
+                    <span>Administrador ▾</span>
+                </div>
+            </header>
+
+            <!-- Card/Formulario Principal -->
+            <div class="tarjeta-formulario">
+                
+                <div class="encabezado-seccion">
+                    <span class="icono-encabezado">🐄</span>
+                    <h2>DATOS DEL ANIMAL</h2>
+                </div>
+
+                <form id="form-registro-animal">
+                    <div class="grid-formulario">
+                        
+                        <!-- ARETE / REGISTRO -->
+                        <div class="campo-grupo">
+                            <label for="arete">🏷️ ARETE / REGISTRO:</label>
+                            <input type="text" id="arete" name="arete" placeholder="Ej: A-0102" required>
+                        </div>
+
+                        <!-- NOMBRE -->
+                        <div class="campo-grupo">
+                            <label for="nombre">🏷️ Nombre:</label>
+                            <input type="text" id="nombre" name="nombre" placeholder="Nombre del animal" required>
+                        </div>
+
+                        <!-- SEXO -->
+                        <div class="campo-grupo">
+                            <label for="sexo">♂️♀️ Sexo:</label>
+                            <select id="sexo" name="sexo" required>
+                                <option value="" disabled selected>Seleccione...</option>
+                                <option value="Hembra">Hembra</option>
+                                <option value="Macho">Macho</option>
+                            </select>
+                        </div>
+
+                        <!-- RAZA -->
+                        <div class="campo-grupo">
+                            <label for="raza">🐂 Raza:</label>
+                            <select id="raza" name="raza" required>
+                                <option value="" disabled selected>Seleccione raza...</option>
+                                <option value="Brahman">Brahman</option>
+                                <option value="Angus">Angus</option>
+                                <option value="Hereford">Hereford</option>
+                                <option value="Holstein">Holstein</option>
+                                <option value="Simmental">Simmental</option>
+                                <option value="Nelore">Nelore</option>
+                                <option value="Jersey">Jersey</option>
+                                <option value="Girolando">Girolando</option>
+                                <option value="Brangus">Brangus</option>
+                                <option value="Charolais">Charolais</option>
+                                <option value="Pardo Suizo">Pardo Suizo / Swiss Brown</option>
+                                <option value="Gyr">Gyr / Guzerat</option>
+                                <option value="Criollo">Criollo / Mestizo</option>
+                                <option value="Otra">Otra Raza</option>
+                            </select>
+                        </div>
+
+                        <!-- FECHA DE NACIMIENTO -->
+                        <div class="campo-grupo">
+                            <label for="fecha-nacimiento">📅 Fecha de Nacimiento:</label>
+                            <input type="date" id="fecha-nacimiento" name="fecha_nacimiento" required>
+                        </div>
+
+                        <!-- EDAD EN MESES (Cálculo automático) -->
+                        <div class="campo-grupo">
+                            <label for="edad-meses">📅 Edad (Meses):</label>
+                            <input type="text" id="edad-meses" name="edad_meses" placeholder="Seleccione fecha nac." readonly class="campo-calculado">
+                        </div>
+
+                        <!-- ESTADO DE SALUD -->
+                        <div class="campo-grupo">
+                            <label for="estado-salud">💚 Estado de Salud:</label>
+                            <select id="estado-salud" name="estado_salud" required>
+                                <option value="" disabled selected>Seleccione estado...</option>
+                                <option value="Excelente">Excelente</option>
+                                <option value="Bueno">Bueno</option>
+                                <option value="Regular">Regular</option>
+                                <option value="En Tratamiento">En Tratamiento</option>
+                                <option value="Crítico">Crítico</option>
+                            </select>
+                        </div>
+
+                        <!-- FECHA DE REGISTRO (Automática) -->
+                        <div class="campo-grupo">
+                            <label for="fecha-registro">📅 Fecha de Registro:</label>
+                            <input type="date" id="fecha-registro" name="fecha_registro" readonly class="campo-calculado">
+                        </div>
+<!-- OBSERVACIONES (Ocupa el ancho completo) -->
+<div class="campo-grupo campo-completo">
+    <label for="observaciones">📝 Observaciones / Notas:</label>
+    <textarea id="observaciones" name="observaciones" rows="3" placeholder="Añada notas sobre salud, marcas, vacunas, temperamento, etc."></textarea>
+</div>
+                    </div>
+
+                    <!-- CAJA DE ADVERTENCIA / IMPORTANTE -->
+                    <div class="caja-importante">
+                        <div class="icono-info">ℹ️</div>
+                        <div class="texto-info">
+                            <strong>Importante</strong>
+                            <p>Verifique que todos los datos estén correctos antes de guardar el registro.</p>
+                        </div>
+                        <div class="silueta-vaca">🐄</div>
+                    </div>
+
+                    <!-- BOTONES DE ACCIÓN -->
+                    <div class="contenedor-botones">
+                        <button type="submit" class="btn-guardar">💾 Guardar Registro</button>
+                        <button type="button" id="btn-limpiar" class="btn-limpiar">🗑️ Limpiar Formulario</button>
+                    </div>
+
+                </form>
+
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Script de la sección -->
+    <script src="js/animales.js"></script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!-- rancho/index.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rancho Alejandro - Inicio</title>
+    
+    <!-- Estilos Globales -->
+    <link rel="stylesheet" href="css/global.css">
+    <!-- Estilos específicos de esta sección -->
+    <link rel="stylesheet" href="css/inicio.css">
+</head>
+<body>
+
+    <div class="contenedor-principal">
+
+        <!-- --- MENÚ LATERAL / BANNER --- -->
+        <aside class="sidebar">
+            <div class="banner-contenedor">
+                <img src="assets/logo.png" alt="Registro de Ganado - Rancho Alejandro" class="imagen-banner">
+            </div>
+
+            <footer class="sidebar-footer">
+                <p>🛡️ Sistema de Control Ganadero - Rancho Alejandro</p>
+            </footer>
+        </aside>
+
+        <!-- --- ÁREA DE CONTENIDO PRINCIPAL --- -->
+        <main class="contenido">
+            
+            <!-- Barra Superior (Solo mantiene el usuario a la derecha) -->
+            <header class="top-bar">
+                <div class="espacio-vacio"></div>
+                <div class="usuario-info">
+                    <div class="avatar-placeholder"></div>
+                    <span>Administrador ▾</span>
+                </div>
+            </header>
+
+            <!-- Bienvenida Central -->
+            <section class="bienvenida-central">
+                <h1 class="titulo-grande">RANCHO ALEJANDRO</h1>
+                <p class="subtitulo-bienvenida">TE DA LA BIENVENIDA</p>
+                <div class="adorno-linea"></div>
+                <p class="desc-instruccion">Selecciona una opción para continuar</p>
+            </section>
+
+            <!-- Contenedor de Tarjetas de Opción -->
+            <section class="contenedor-tarjetas">
+                
+                <!-- Tarjeta ANIMALES -->
+                <!-- Tarjeta ANIMALES -->
+<a href="animales.html" class="tarjeta" id="btn-animales">
+    <div class="icono-tarjeta">🐄</div>
+    <h2 class="titulo-tarjeta">ANIMALES</h2>
+    <p class="desc-tarjeta">
+        Registrar y consultar los animales del rancho.
+    </p>
+    <button class="boton-flecha">›</button>
+</a>
+
+                <!-- Tarjeta REPORTES -->
+                <a href="reportes.html" class="tarjeta" id="btn-reportes">
+                    <div class="icono-tarjeta">📋</div>
+                    <h2 class="titulo-tarjeta">REPORTES</h2>
+                    <p class="desc-tarjeta">
+                        Generar reportes y estadísticas del ganado.
+                    </p>
+                    <button class="boton-flecha">›</button>
+                </a>
+
+            </section>
+
+        </main>
+    </div>
+
+    <script src="js/inicio.js"></script>
+</body>
+</html>

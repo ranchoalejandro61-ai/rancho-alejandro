@@ -1,0 +1,25 @@
+/* rancho/css/global.css */
+
+/* Reset básico */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Definición de Variables de Color del Diseño */
+:root {
+    --verde-oscuro: #2a4d33; /* El color principal del menú lateral y botones */
+    --crema-fondo: #fbf9f6;  /* El fondo claro de la zona principal */
+    --texto-principal: #333333;
+    --texto-secundario: #666666;
+    --borde-tarjeta: #e0e0e0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* O una fuente similar serif si prefieres */
+    background-color: var(--crema-fondo);
+    color: var(--texto-principal);
+    display: flex; /* Para el diseño de dos columnas */
+    min-height: 100vh;
+}

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rancho Alejandro - Consulta y Reportes</title>
+    
+    <!-- Estilos Globales -->
+    <link rel="stylesheet" href="css/global.css">
+    <!-- Estilos específicos de Reportes -->
+    <link rel="stylesheet" href="css/reportes.css">
+</head>
+<body>
+
+    <div class="contenedor-principal">
+
+        <!-- --- MENÚ LATERAL / BANNER (Misma línea gráfica) --- -->
+        <aside class="sidebar">
+            <div class="banner-contenedor">
+                <img src="assets/logo.png" alt="Registro de Ganado - Rancho Alejandro" class="imagen-banner" onerror="this.src='https://via.placeholder.com/280x600?text=RANCHO+ALEJANDRO'">
+            </div>
+
+            <footer class="sidebar-footer">
+                <p>🛡️ Sistema de Control Ganadero - Rancho Alejandro</p>
+            </footer>
+        </aside>
+
+        <!-- --- CONTENIDO DE REPORTES Y CONSULTA --- -->
+        <main class="contenido">
+            
+            <!-- Header con botón Volver -->
+            <header class="top-bar">
+                <a href="index.html" class="btn-volver">← Volver al Inicio</a>
+                <div class="usuario-info">
+                    <div class="avatar-placeholder"></div>
+                    <span>Administrador ▾</span>
+                </div>
+            </header>
+
+            <!-- Encabezado de la Sección -->
+            <div class="encabezado-reportes">
+                <h2>📋 CONSULTA Y REPORTES DE GANADO</h2>
+                <p>Filtre, consulte y exporte el historial de animales registrados.</p>
+            </div>
+
+            <!-- TARJETAS DE RESUMEN RÁPIDO (Métricas) -->
+            <section class="tarjetas-resumen">
+                <div class="tarjeta-kpi">
+                    <span class="kpi-icono">🐂</span>
+                    <div>
+                        <h3 id="total-animales">0</h3>
+                        <p>Total Animales</p>
+                    </div>
+                </div>
+                <div class="tarjeta-kpi">
+                    <span class="kpi-icono">♀️</span>
+                    <div>
+                        <h3 id="total-hembras">0</h3>
+                        <p>Hembras</p>
+                    </div>
+                </div>
+                <div class="tarjeta-kpi">
+                    <span class="kpi-icono">♂️</span>
+                    <div>
+                        <h3 id="total-machos">0</h3>
+                        <p>Machos</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PANEL DE CONTROLES (Buscador + Exportar) -->
+            <div class="panel-controles">
+                <div class="caja-busqueda">
+                    <span class="icono-buscar">🔍</span>
+                    <input type="text" id="input-busqueda" placeholder="Buscar por Arete/Registro o Nombre...">
+                </div>
+
+                <div class="acciones-exportar">
+                    <button id="btn-exportar-excel" class="btn-exportar btn-excel">📊 Exportar Excel</button>
+                    <button id="btn-exportar-pdf" class="btn-exportar btn-pdf">📄 Exportar PDF</button>
+                </div>
+            </div>
+
+            <!-- CONTENEDOR DE LA TABLA -->
+            <div class="tarjeta-tabla">
+                <div class="contenedor-responsive-tabla">
+                    <table class="tabla-ganado">
+                        <thead>
+                            <tr>
+                                <th>Arete / Reg.</th>
+                                <th>Nombre</th>
+                                <th>Sexo</th>
+                                <th>Raza</th>
+                                <th>Edad</th>
+                                <th>Salud</th>
+                                <th>F. Registro</th>
+                                <th>Observaciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-cuerpo">
+                            <!-- Los datos se inyectarán mediante JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="mensaje-sin-resultados" class="sin-resultados" style="display: none;">
+                    No se encontraron animales con el criterio de búsqueda.
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Script de la sección -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    
+    <!-- Librería para Exportar a PDF (html2pdf.js) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="js/reportes.js"></script>
+</body>
+</html>

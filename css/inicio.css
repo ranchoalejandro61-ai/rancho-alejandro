@@ -1,0 +1,214 @@
+/* rancho/css/inicio.css */
+
+/* --- Estructura Principal --- */
+.contenedor-principal {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+}
+
+/* --- Menú Lateral (Sidebar) --- */
+.sidebar {
+    width: 280px;
+    min-width: 280px; /* Evita que se aplaste en escritorio */
+    background-color: var(--verde-oscuro);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+
+.banner-contenedor {
+    width: 100%;
+    margin-bottom: auto;
+}
+
+.imagen-banner {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 10px;
+    object-fit: contain;
+}
+
+.sidebar-footer {
+    text-align: center;
+    font-size: 0.7rem;
+    opacity: 0.8;
+    padding: 10px 0 5px 0;
+}
+
+/* --- Área de Contenido Principal --- */
+.contenido {
+    flex: 1;
+    padding: 20px 40px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Barra Superior */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.usuario-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    color: var(--texto-secundario);
+    cursor: pointer;
+}
+
+.avatar-placeholder {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #d0d0d0;
+}
+
+/* Sección de Bienvenida Central */
+.bienvenida-central {
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 30px;
+}
+
+.titulo-grande {
+    font-family: 'Georgia', serif;
+    font-size: 2.5rem;
+    color: var(--verde-oscuro);
+    letter-spacing: 2px;
+    margin-bottom: 5px;
+}
+
+.subtitulo-bienvenida {
+    font-size: 0.9rem;
+    color: #8b6d43; /* Tono café elegante */
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+.desc-instruccion {
+    font-size: 0.9rem;
+    color: var(--texto-secundario);
+    margin-top: 15px;
+}
+
+/* Contenedor de Tarjetas */
+.contenedor-tarjetas {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    flex-wrap: wrap;
+}
+
+.tarjeta {
+    background: white;
+    border: 1px solid var(--borde-tarjeta);
+    border-radius: 15px;
+    width: 250px;
+    padding: 25px 20px;
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.tarjeta:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+}
+
+.icono-tarjeta {
+    font-size: 2.2rem;
+    margin-bottom: 15px;
+}
+
+.titulo-tarjeta {
+    font-size: 1rem;
+    color: var(--verde-oscuro);
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+}
+
+.desc-tarjeta {
+    font-size: 0.8rem;
+    color: var(--texto-secundario);
+    line-height: 1.4;
+    margin-bottom: 20px;
+    min-height: 35px;
+}
+
+.boton-flecha {
+    background-color: var(--verde-oscuro);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    width: 100%;
+    padding: 8px;
+    font-size: 1.1rem;
+    cursor: pointer;
+}
+
+
+/* =================================================== */
+/* ADAPTACIÓN PARA MÓVILES (Responsive Layout)          */
+/* =================================================== */
+@media (max-width: 768px) {
+    .contenedor-principal {
+        flex-direction: column; /* Apila el contenido verticalmente */
+    }
+
+    /* Ocultamos la imagen gigante del banner en teléfonos */
+    .sidebar .banner-contenedor {
+        display: none;
+    }
+
+    /* Transformamos la barra lateral en una cabecera superior delgada */
+    .sidebar {
+        width: 100%;
+        min-width: 100%;
+        border-radius: 0 0 15px 15px; /* Bordes redondeados abajo */
+        padding: 12px 15px;
+        text-align: center;
+    }
+
+    .sidebar-footer {
+        padding: 0;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    /* Ajustamos los espacios para que el contenido suba */
+    .contenido {
+        padding: 20px 15px;
+    }
+
+    .bienvenida-central {
+        margin-top: 5px;
+        margin-bottom: 25px;
+    }
+
+    .titulo-grande {
+        font-size: 1.8rem;
+    }
+
+    /* Las tarjetas se adaptan a 1 sola columna fácil de tocar */
+    .contenedor-tarjetas {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .tarjeta {
+        width: 100%;
+        max-width: 100%; /* Toma todo el ancho disponible del teléfono */
+    }
+}
