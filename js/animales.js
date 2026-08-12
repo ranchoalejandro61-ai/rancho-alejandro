@@ -8,6 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const fechaRegistroInput = document.getElementById('fecha-registro');
     const fechaNacimientoInput = document.getElementById('fecha-nacimiento');
     const edadMesesInput = document.getElementById('edad-meses');
+    const padreInput = document.getElementById('padre');
+    const madreInput = document.getElementById('madre');
     const form = document.getElementById('form-registro-animal');
     const btnLimpiar = document.getElementById('btn-limpiar');
     const btnGuardar = document.querySelector('.btn-guardar');
@@ -73,6 +75,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 fechaNacimiento: fechaNacimientoInput.value,
                 edadMeses: edadMesesInput.value,
                 estadoSalud: document.getElementById('estado-salud').value,
+                padre: padreInput ? (padreInput.value.trim() || '-') : '-',
+                madre: madreInput ? (madreInput.value.trim() || '-') : '-',
                 fechaRegistro: fechaRegistroInput.value,
                 observaciones: document.getElementById('observaciones').value
             };

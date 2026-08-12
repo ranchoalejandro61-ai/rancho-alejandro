@@ -67,12 +67,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 fechaRegLimpia = fechaRegLimpia.split('T')[0];
             }
 
+            // Validar padre y madre para que muestren '-' si están vacíos
+            const padre = animal.padre && animal.padre.toString().trim() !== '' ? animal.padre : '-';
+            const madre = animal.madre && animal.madre.toString().trim() !== '' ? animal.madre : '-';
+
             tr.innerHTML = `
                 <td><strong>${animal.arete || '-'}</strong></td>
                 <td>${animal.nombre || '-'}</td>
                 <td>${animal.sexo === 'Hembra' ? '♀️ Hembra' : '♂️ Macho'}</td>
                 <td>${animal.raza || '-'}</td>
                 <td>${animal.edadMeses || '-'}</td>
+                <td>${padre}</td>
+                <td>${madre}</td>
                 <td><span class="badge-salud ${claseSalud}">${animal.estadoSalud || 'Bueno'}</span></td>
                 <td>${fechaRegLimpia || '-'}</td>
                 <td>${animal.observaciones || '-'}</td>
@@ -161,6 +167,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 "RAZA": a.raza || '-',
                 "FECHA NACIMIENTO": a.fechaNacimiento || '-',
                 "EDAD": a.edadMeses || '-',
+                "PADRE": a.padre || '-',
+                "MADRE": a.madre || '-',
                 "ESTADO DE SALUD": a.estadoSalud || '-',
                 "FECHA REGISTRO": a.fechaRegistro || '-',
                 "OBSERVACIONES": a.observaciones || '-'
@@ -174,7 +182,6 @@ document.addEventListener('DOMContentLoaded', () => {
             XLSX.writeFile(libro, `Reporte_Ganado_Rancho_Alejandro_${fechaHoy}.xlsx`);
         });
     }
-
     // 7. EXPORTAR A PDF CON MEMBRETE Y LOGO
     if (btnPDF) {
         btnPDF.addEventListener('click', () => {
@@ -217,6 +224,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             <th style="padding: 8px; border: 1px solid #1e3825;">Sexo</th>
                             <th style="padding: 8px; border: 1px solid #1e3825;">Raza</th>
                             <th style="padding: 8px; border: 1px solid #1e3825;">Edad</th>
+                            <th style="padding: 8px; border: 1px solid #1e3825;">Padre</th>
+                            <th style="padding: 8px; border: 1px solid #1e3825;">Madre</th>
                             <th style="padding: 8px; border: 1px solid #1e3825;">Salud</th>
                             <th style="padding: 8px; border: 1px solid #1e3825;">F. Registro</th>
                             <th style="padding: 8px; border: 1px solid #1e3825;">Observaciones</th>
@@ -230,6 +239,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <td style="padding: 7px; border: 1px solid #e5e7eb;">${a.sexo || '-'}</td>
                                 <td style="padding: 7px; border: 1px solid #e5e7eb;">${a.raza || '-'}</td>
                                 <td style="padding: 7px; border: 1px solid #e5e7eb;">${a.edadMeses || '-'}</td>
+                                <td style="padding: 7px; border: 1px solid #e5e7eb;">${a.padre || '-'}</td>
+                                <td style="padding: 7px; border: 1px solid #e5e7eb;">${a.madre || '-'}</td>
                                 <td style="padding: 7px; border: 1px solid #e5e7eb;">${a.estadoSalud || '-'}</td>
                                 <td style="padding: 7px; border: 1px solid #e5e7eb;">${a.fechaRegistro || '-'}</td>
                                 <td style="padding: 7px; border: 1px solid #e5e7eb;">${a.observaciones || '-'}</td>
