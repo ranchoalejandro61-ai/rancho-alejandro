@@ -21,7 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 1. Cargar Datos desde Google Sheets
     async function cargarDatosGoogleSheets() {
-        tablaCuerpo.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:20px;">⏳ Cargando datos desde Google Sheets...</td></tr>`;
+        if (!tablaCuerpo) return;
+        tablaCuerpo.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:20px;">⏳ Cargando datos desde Google Sheets...</td></tr>`;
 
         try {
             const respuesta = await fetch(URL_WEB_APP, {
@@ -37,21 +38,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error("Error cargando los datos:", error);
-            tablaCuerpo.innerHTML = `<tr><td colspan="9" style="text-align:center; color:red; padding:20px;">❌ Error al obtener los datos de la base de datos.</td></tr>`;
+            tablaCuerpo.innerHTML = `<tr><td colspan="11" style="text-align:center; color:red; padding:20px;">❌ Error al obtener los datos de la base de datos.</td></tr>`;
         }
     }
 
     // 2. Renderizar la Tabla
     function renderizarTabla(lista) {
+        if (!tablaCuerpo) return;
         tablaCuerpo.innerHTML = '';
 
         if (lista.length === 0) {
-            mensajeSinResultados.style.display = 'block';
+            if (mensajeSinResultados) mensajeSinResultados.style.display = 'block';
             actualizarMetricas([]);
             return;
         }
 
-        mensajeSinResultados.style.display = 'none';
+        if (mensajeSinResultados) mensajeSinResultados.style.display = 'none';
 
         lista.forEach(animal => {
             const tr = document.createElement('tr');
@@ -76,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${animal.nombre || '-'}</td>
                 <td>${animal.sexo === 'Hembra' ? '♀️ Hembra' : '♂️ Macho'}</td>
                 <td>${animal.raza || '-'}</td>
-                <td>${animal.edadMeses || '-'}</td>
+                <td>${animal.edadMeses ? animal.edadMeses + ' meses' : '-'}</td>
                 <td>${padre}</td>
                 <td>${madre}</td>
                 <td><span class="badge-salud ${claseSalud}">${animal.estadoSalud || 'Bueno'}</span></td>
@@ -110,8 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!confirmacion) return;
 
         try {
-            // Deshabilitar pantalla o mostrar aviso
-            tablaCuerpo.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:20px;">⏳ Eliminando registro de Google Sheets...</td></tr>`;
+            tablaCuerpo.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:20px;">⏳ Eliminando registro de Google Sheets...</td></tr>`;
 
             await fetch(URL_WEB_APP, {
                 method: 'POST',
@@ -121,8 +122,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             alert(`✅ El animal con Arete ${arete} fue eliminado correctamente.`);
-            
-            // Recargar datos desde la hoja
             cargarDatosGoogleSheets();
 
         } catch (error) {
@@ -134,12 +133,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 4. Actualizar Contadores Superiores
     function actualizarMetricas(lista) {
-        elemTotal.textContent = lista.length;
-        elemHembras.textContent = lista.filter(a => a.sexo === 'Hembra').length;
-        elemMachos.textContent = lista.filter(a => a.sexo === 'Macho').length;
+        if (elemTotal) elemTotal.textContent = lista.length;
+        if (elemHembras) elemHembras.textContent = lista.filter(a => a.sexo === 'Hembra').length;
+        if (elemMachos) elemMachos.textContent = lista.filter(a => a.sexo === 'Macho').length;
     }
 
-    // 5. Buscador en Tiempo Real por Arete o Nombre (Blindado para números y textos)
+    // 5. Buscador en Tiempo Real por Arete o Nombre
     if (inputBusqueda) {
         inputBusqueda.addEventListener('input', (e) => {
             const texto = e.target.value.toLowerCase().trim();
@@ -182,6 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
             XLSX.writeFile(libro, `Reporte_Ganado_Rancho_Alejandro_${fechaHoy}.xlsx`);
         });
     }
+
     // 7. EXPORTAR A PDF CON MEMBRETE Y LOGO
     if (btnPDF) {
         btnPDF.addEventListener('click', () => {
