@@ -249,6 +249,10 @@
 .tabla-ganado td {
     padding: 12px 16px;
     color: #333;
+    max-width: 250px;           /* Limita el ancho para evitar que se extienda a la derecha */
+    word-break: break-word;     /* Quiebra palabras o textos largos continuos */
+    overflow-wrap: break-word;  /* Ajusta el texto al ancho de la celda */
+    white-space: normal;        /* Permite saltos de línea automáticos */
 }
 
 .badge-salud {
