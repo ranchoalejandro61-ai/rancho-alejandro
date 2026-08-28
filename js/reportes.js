@@ -1,10 +1,9 @@
 // rancho/js/reportes.js
 
-// URL de tu Web App de Google Apps Script
 const URL_WEB_APP = 'https://script.google.com/macros/s/AKfycbz_GxDuKOMVYSPM9FWPR__TwRyhgDb3_wBzqlrGt_XRbwvzsR53vK2lutwUUfyA9PivAA/exec';
 
-let listaAnimalesBase = []; // Almacenará los datos de Google Sheets
-let listaFiltrada = [];     // Mantendrá los datos filtrados por el buscador
+let listaAnimalesBase = []; 
+let listaFiltrada = [];     
 
 document.addEventListener('DOMContentLoaded', () => {
     
@@ -69,23 +68,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 fechaRegLimpia = fechaRegLimpia.split('T')[0];
             }
 
-            // Validar padre y madre para que muestren '-' si están vacíos
             const padre = animal.padre && animal.padre.toString().trim() !== '' ? animal.padre : '-';
             const madre = animal.madre && animal.madre.toString().trim() !== '' ? animal.madre : '-';
+            
+            let edadTexto = animal.edadMeses || '-';
+            if (edadTexto !== '-' && !String(edadTexto).includes('meses')) {
+                edadTexto += ' meses';
+            }
 
             tr.innerHTML = `
                 <td><strong>${animal.arete || '-'}</strong></td>
                 <td>${animal.nombre || '-'}</td>
                 <td>${animal.sexo === 'Hembra' ? '♀️ Hembra' : '♂️ Macho'}</td>
                 <td>${animal.raza || '-'}</td>
-                <td>${animal.edadMeses ? animal.edadMeses + ' meses' : '-'}</td>
+                <td>${edadTexto}</td>
                 <td>${padre}</td>
                 <td>${madre}</td>
                 <td><span class="badge-salud ${claseSalud}">${animal.estadoSalud || 'Bueno'}</span></td>
                 <td>${fechaRegLimpia || '-'}</td>
                 <td>${animal.observaciones || '-'}</td>
-                <td style="text-align: center;">
-                    <button class="btn-eliminar" data-arete="${animal.arete}" data-nombre="${animal.nombre}" style="background-color: #dc2626; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; transition: background 0.2s;">
+                <td style="text-align: center; white-space: nowrap;">
+                    <button class="btn-editar" data-arete="${animal.arete}" data-nombre="${animal.nombre}" data-salud="${animal.estadoSalud || 'Bueno'}" data-obs="${animal.observaciones || ''}" style="background-color: #2563eb; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; margin-right: 4px;">
+                        ✏️ Editar
+                    </button>
+                    <button class="btn-eliminar" data-arete="${animal.arete}" data-nombre="${animal.nombre}" style="background-color: #dc2626; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">
                         🗑️ Eliminar
                     </button>
                 </td>
@@ -93,19 +99,85 @@ document.addEventListener('DOMContentLoaded', () => {
             tablaCuerpo.appendChild(tr);
         });
 
-        // Event listener para los botones de eliminar
+        // Listeners para botones de Eliminar
         document.querySelectorAll('.btn-eliminar').forEach(boton => {
             boton.addEventListener('click', (e) => {
-                const arete = e.target.getAttribute('data-arete');
-                const nombre = e.target.getAttribute('data-nombre');
+                const arete = e.currentTarget.getAttribute('data-arete');
+                const nombre = e.currentTarget.getAttribute('data-nombre');
                 eliminarAnimal(arete, nombre);
+            });
+        });
+
+        // Listeners para botones de Editar
+        document.querySelectorAll('.btn-editar').forEach(boton => {
+            boton.addEventListener('click', (e) => {
+                const arete = e.currentTarget.getAttribute('data-arete');
+                const nombre = e.currentTarget.getAttribute('data-nombre');
+                const saludActual = e.currentTarget.getAttribute('data-salud');
+                const obsActual = e.currentTarget.getAttribute('data-obs');
+                editarAnimal(arete, nombre, saludActual, obsActual);
             });
         });
 
         actualizarMetricas(lista);
     }
 
-    // 3. Función para Eliminar Animal
+    // 3. Función para Editar Salud y Observaciones usando Modal
+function editarAnimal(arete, nombre, saludActual, obsActual) {
+    const modal = document.getElementById('modal-editar');
+    const infoText = document.getElementById('modal-info-animal');
+    const selectSalud = document.getElementById('modal-salud');
+    const inputObs = document.getElementById('modal-observaciones');
+    const btnGuardar = document.getElementById('btn-guardar-modal');
+    const btnCancelar = document.getElementById('btn-cancelar-modal');
+
+    // Cargar los datos actuales en el modal
+    infoText.textContent = `Animal: ${nombre} (Arete: ${arete})`;
+    selectSalud.value = saludActual || "Bueno";
+    inputObs.value = obsActual || "";
+
+    // Mostrar modal (usando flex para centrarlo)
+    modal.style.display = 'flex';
+
+    // Cerrar modal al cancelar
+    btnCancelar.onclick = () => {
+        modal.style.display = 'none';
+    };
+
+    // Guardar cambios
+    btnGuardar.onclick = async () => {
+        const nuevaSalud = selectSalud.value;
+        const nuevaObs = inputObs.value.trim();
+
+        modal.style.display = 'none';
+
+        try {
+            tablaCuerpo.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:20px;">⏳ Actualizando registro en Google Sheets...</td></tr>`;
+
+            await fetch(URL_WEB_APP, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    accion: "editar",
+                    arete: arete,
+                    estadoSalud: nuevaSalud,
+                    observaciones: nuevaObs
+                })
+            });
+
+            alert(`✅ El animal con Arete ${arete} ha sido actualizado.`);
+            cargarDatosGoogleSheets();
+
+        } catch (error) {
+            console.error("Error al editar:", error);
+            alert("❌ Hubo un error al intentar editar el registro.");
+            cargarDatosGoogleSheets();
+        }
+    };
+}
+
+    // 4. Función para Eliminar Animal
     async function eliminarAnimal(arete, nombre) {
         const confirmacion = confirm(`¿Estás seguro de que deseas eliminar al animal "${nombre}" con Arete: ${arete}? Esta acción lo borrará también de la base de datos.`);
         
@@ -131,14 +203,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 4. Actualizar Contadores Superiores
+    // 5. Actualizar Contadores Superiores
     function actualizarMetricas(lista) {
         if (elemTotal) elemTotal.textContent = lista.length;
         if (elemHembras) elemHembras.textContent = lista.filter(a => a.sexo === 'Hembra').length;
         if (elemMachos) elemMachos.textContent = lista.filter(a => a.sexo === 'Macho').length;
     }
 
-    // 5. Buscador en Tiempo Real por Arete o Nombre
+    // 6. Buscador en Tiempo Real por Arete o Nombre
     if (inputBusqueda) {
         inputBusqueda.addEventListener('input', (e) => {
             const texto = e.target.value.toLowerCase().trim();
@@ -151,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 6. EXPORTAR A EXCEL
+    // 7. EXPORTAR A EXCEL
     if (btnExcel) {
         btnExcel.addEventListener('click', () => {
             if (listaFiltrada.length === 0) {
@@ -182,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 7. EXPORTAR A PDF CON MEMBRETE Y LOGO
+    // 8. EXPORTAR A PDF
     if (btnPDF) {
         btnPDF.addEventListener('click', () => {
             if (listaFiltrada.length === 0) {
