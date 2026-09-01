@@ -5,6 +5,12 @@ const URL_WEB_APP = 'https://script.google.com/macros/s/AKfycbz_GxDuKOMVYSPM9FWP
 let listaAnimalesBase = []; 
 let listaFiltrada = [];     
 
+// paginacion 
+let datosOriginales = []; // Guarda la copia de la base de datos completa
+let animalesFiltradosGlobal = []; // Guarda los resultados filtrados o el total
+let paginaActual = 1;
+const REGISTROS_POR_PAGINA = 10;
+
 document.addEventListener('DOMContentLoaded', () => {
     
     const tablaCuerpo = document.getElementById('tabla-cuerpo');
@@ -19,135 +25,163 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnPDF = document.getElementById('btn-exportar-pdf');
 
     // 1. Cargar Datos desde Google Sheets
-    async function cargarDatosGoogleSheets() {
-        if (!tablaCuerpo) return;
-        tablaCuerpo.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:20px;">⏳ Cargando datos desde Google Sheets...</td></tr>`;
+async function cargarDatosGoogleSheets() {
+    if (!tablaCuerpo) return;
+    tablaCuerpo.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:20px;">⏳ Cargando datos desde Google Sheets...</td></tr>`;
 
-        try {
-            const respuesta = await fetch(URL_WEB_APP, {
-                method: 'GET',
-                redirect: 'follow'
-            });
-            
-            const datos = await respuesta.json();
-            
-            listaAnimalesBase = datos;
-            listaFiltrada = [...datos];
-            renderizarTabla(listaFiltrada);
+    try {
+        const respuesta = await fetch(URL_WEB_APP, {
+            method: 'GET',
+            redirect: 'follow'
+        });
+        
+        const datos = await respuesta.json();
+        
+        datosOriginales = datos;
+        animalesFiltradosGlobal = datos;
+        paginaActual = 1;
+        
+        actualizarMetricas(animalesFiltradosGlobal);
+        renderizarTablaPaginada();
 
-        } catch (error) {
-            console.error("Error cargando los datos:", error);
-            tablaCuerpo.innerHTML = `<tr><td colspan="11" style="text-align:center; color:red; padding:20px;">❌ Error al obtener los datos de la base de datos.</td></tr>`;
-        }
+    } catch (error) {
+        console.error("Error cargando los datos:", error);
+        tablaCuerpo.innerHTML = `<tr><td colspan="11" style="text-align:center; color:red; padding:20px;">❌ Error al obtener los datos de la base de datos.</td></tr>`;
+    }
+}
+
+// 2. Renderizar la Tabla (Con Paginación)
+function renderizarTablaPaginada() {
+    if (!tablaCuerpo) return;
+    tablaCuerpo.innerHTML = '';
+
+    const totalRegistros = animalesFiltradosGlobal.length;
+
+    if (totalRegistros === 0) {
+        if (mensajeSinResultados) mensajeSinResultados.style.display = 'block';
+        actualizarControlesPaginacion(0, 0, 0, 1);
+        return;
     }
 
-    // 2. Renderizar la Tabla
-    function renderizarTabla(lista) {
-        if (!tablaCuerpo) return;
-        tablaCuerpo.innerHTML = '';
+    if (mensajeSinResultados) mensajeSinResultados.style.display = 'none';
 
-        if (lista.length === 0) {
-            if (mensajeSinResultados) mensajeSinResultados.style.display = 'block';
-            actualizarMetricas([]);
-            return;
+    // Calcular paginación
+    const totalPaginas = Math.ceil(totalRegistros / REGISTROS_POR_PAGINA);
+    if (paginaActual > totalPaginas) paginaActual = totalPaginas;
+    if (paginaActual < 1) paginaActual = 1;
+
+    const inicio = (paginaActual - 1) * REGISTROS_POR_PAGINA;
+    const fin = Math.min(inicio + REGISTROS_POR_PAGINA, totalRegistros);
+
+    // Cortar solo 10 registros para la página actual
+    const vacasPagina = animalesFiltradosGlobal.slice(inicio, fin);
+
+    vacasPagina.forEach(animal => {
+        const tr = document.createElement('tr');
+        
+        let claseSalud = 'salud-bueno';
+        if (animal.estadoSalud === 'Excelente') claseSalud = 'salud-excelente';
+        if (animal.estadoSalud === 'Regular') claseSalud = 'salud-regular';
+        if (animal.estadoSalud === 'En Tratamiento') claseSalud = 'salud-tratamiento';
+        if (animal.estadoSalud === 'Crítico') claseSalud = 'salud-critico';
+
+        let fechaRegLimpia = animal.fechaRegistro;
+        if (typeof fechaRegLimpia === 'string' && fechaRegLimpia.includes('T')) {
+            fechaRegLimpia = fechaRegLimpia.split('T')[0];
         }
 
-        if (mensajeSinResultados) mensajeSinResultados.style.display = 'none';
+        const padre = animal.padre && animal.padre.toString().trim() !== '' ? animal.padre : '-';
+        const madre = animal.madre && animal.madre.toString().trim() !== '' ? animal.madre : '-';
+        
+        let edadTexto = animal.edadMeses || '-';
+        if (edadTexto !== '-' && !String(edadTexto).includes('meses')) {
+            edadTexto += ' meses';
+        }
 
-        lista.forEach(animal => {
-            const tr = document.createElement('tr');
-            
-            let claseSalud = 'salud-bueno';
-            if (animal.estadoSalud === 'Excelente') claseSalud = 'salud-excelente';
-            if (animal.estadoSalud === 'Regular') claseSalud = 'salud-regular';
-            if (animal.estadoSalud === 'En Tratamiento') claseSalud = 'salud-tratamiento';
-            if (animal.estadoSalud === 'Crítico') claseSalud = 'salud-critico';
+        tr.innerHTML = `
+            <td><strong>${animal.arete || '-'}</strong></td>
+            <td>${animal.nombre || '-'}</td>
+            <td>${animal.sexo === 'Hembra' ? '♀️ Hembra' : '♂️ Macho'}</td>
+            <td>${animal.raza || '-'}</td>
+            <td>${edadTexto}</td>
+            <td>${padre}</td>
+            <td>${madre}</td>
+            <td><span class="badge-salud ${claseSalud}">${animal.estadoSalud || 'Bueno'}</span></td>
+            <td>${fechaRegLimpia || '-'}</td>
+            <td>${animal.observaciones || '-'}</td>
+            <td style="text-align: center; white-space: nowrap;">
+                <button class="btn-editar" data-arete="${animal.arete || ''}" data-nombre="${animal.nombre || ''}" data-raza="${animal.raza || ''}" data-salud="${animal.estadoSalud || 'Bueno'}" data-obs="${animal.observaciones || ''}" style="background-color: #2563eb; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; margin-right: 4px;">
+                    ✏️ Editar
+                </button>
+                <button class="btn-eliminar" data-arete="${animal.arete || ''}" data-nombre="${animal.nombre || ''}" style="background-color: #dc2626; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">
+                    🗑️ Eliminar
+                </button>
+            </td>
+        `;
+        tablaCuerpo.appendChild(tr);
+    });
 
-            let fechaRegLimpia = animal.fechaRegistro;
-            if (typeof fechaRegLimpia === 'string' && fechaRegLimpia.includes('T')) {
-                fechaRegLimpia = fechaRegLimpia.split('T')[0];
-            }
+    // Re-asignar eventos a los botones recién pintados en el DOM
+    asignarEventosBotonesTabla();
+    actualizarControlesPaginacion(inicio + 1, fin, totalRegistros, totalPaginas);
+}
 
-            const padre = animal.padre && animal.padre.toString().trim() !== '' ? animal.padre : '-';
-            const madre = animal.madre && animal.madre.toString().trim() !== '' ? animal.madre : '-';
-            
-            let edadTexto = animal.edadMeses || '-';
-            if (edadTexto !== '-' && !String(edadTexto).includes('meses')) {
-                edadTexto += ' meses';
-            }
-
-            tr.innerHTML = `
-                <td><strong>${animal.arete || '-'}</strong></td>
-                <td>${animal.nombre || '-'}</td>
-                <td>${animal.sexo === 'Hembra' ? '♀️ Hembra' : '♂️ Macho'}</td>
-                <td>${animal.raza || '-'}</td>
-                <td>${edadTexto}</td>
-                <td>${padre}</td>
-                <td>${madre}</td>
-                <td><span class="badge-salud ${claseSalud}">${animal.estadoSalud || 'Bueno'}</span></td>
-                <td>${fechaRegLimpia || '-'}</td>
-                <td>${animal.observaciones || '-'}</td>
-                <td style="text-align: center; white-space: nowrap;">
-                    <button class="btn-editar" data-arete="${animal.arete}" data-nombre="${animal.nombre}" data-salud="${animal.estadoSalud || 'Bueno'}" data-obs="${animal.observaciones || ''}" style="background-color: #2563eb; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; margin-right: 4px;">
-                        ✏️ Editar
-                    </button>
-                    <button class="btn-eliminar" data-arete="${animal.arete}" data-nombre="${animal.nombre}" style="background-color: #dc2626; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">
-                        🗑️ Eliminar
-                    </button>
-                </td>
-            `;
-            tablaCuerpo.appendChild(tr);
+// 3. Función para asignar clics a botones de la tabla de forma dinámica
+function asignarEventosBotonesTabla() {
+    document.querySelectorAll('.btn-eliminar').forEach(boton => {
+        boton.addEventListener('click', (e) => {
+            const arete = e.currentTarget.getAttribute('data-arete');
+            const nombre = e.currentTarget.getAttribute('data-nombre');
+            eliminarAnimal(arete, nombre);
         });
+    });
 
-        // Listeners para botones de Eliminar
-        document.querySelectorAll('.btn-eliminar').forEach(boton => {
-            boton.addEventListener('click', (e) => {
-                const arete = e.currentTarget.getAttribute('data-arete');
-                const nombre = e.currentTarget.getAttribute('data-nombre');
-                eliminarAnimal(arete, nombre);
-            });
+    document.querySelectorAll('.btn-editar').forEach(boton => {
+        boton.addEventListener('click', (e) => {
+            const arete = e.currentTarget.getAttribute('data-arete');
+            const nombre = e.currentTarget.getAttribute('data-nombre');
+            const raza = e.currentTarget.getAttribute('data-raza');
+            const saludActual = e.currentTarget.getAttribute('data-salud');
+            const obsActual = e.currentTarget.getAttribute('data-obs');
+            editarAnimal(arete, nombre, raza, saludActual, obsActual);
         });
+    });
+}
 
-        // Listeners para botones de Editar
-        document.querySelectorAll('.btn-editar').forEach(boton => {
-            boton.addEventListener('click', (e) => {
-                const arete = e.currentTarget.getAttribute('data-arete');
-                const nombre = e.currentTarget.getAttribute('data-nombre');
-                const saludActual = e.currentTarget.getAttribute('data-salud');
-                const obsActual = e.currentTarget.getAttribute('data-obs');
-                editarAnimal(arete, nombre, saludActual, obsActual);
-            });
-        });
-
-        actualizarMetricas(lista);
-    }
-
-    // 3. Función para Editar Salud y Observaciones usando Modal
-function editarAnimal(arete, nombre, saludActual, obsActual) {
+// Función para Editar usando Modal
+function editarAnimal(arete, nombreActual, razaActual, saludActual, obsActual) {
     const modal = document.getElementById('modal-editar');
     const infoText = document.getElementById('modal-info-animal');
+    
+    const inputNombre = document.getElementById('modal-nombre');
+    const inputRaza = document.getElementById('modal-raza');
     const selectSalud = document.getElementById('modal-salud');
     const inputObs = document.getElementById('modal-observaciones');
+    
     const btnGuardar = document.getElementById('btn-guardar-modal');
     const btnCancelar = document.getElementById('btn-cancelar-modal');
 
-    // Cargar los datos actuales en el modal
-    infoText.textContent = `Animal: ${nombre} (Arete: ${arete})`;
-    selectSalud.value = saludActual || "Bueno";
-    inputObs.value = obsActual || "";
+    const valNombreClean = (nombreActual && nombreActual !== '-' && nombreActual !== 'null') ? nombreActual : '';
+    const valRazaClean = (razaActual && razaActual !== '-' && razaActual !== 'null') ? razaActual : '';
+    const valObsClean = (obsActual && obsActual !== '-' && obsActual !== 'null') ? obsActual : '';
 
-    // Mostrar modal (usando flex para centrarlo)
+    infoText.textContent = `Arete / Registro: ${arete}`;
+    inputNombre.value = valNombreClean;
+    inputRaza.value = valRazaClean;
+    selectSalud.value = saludActual || "Bueno";
+    inputObs.value = valObsClean;
+
     modal.style.display = 'flex';
 
-    // Cerrar modal al cancelar
     btnCancelar.onclick = () => {
         modal.style.display = 'none';
     };
 
-    // Guardar cambios
     btnGuardar.onclick = async () => {
+        const nuevoNombre = inputNombre.value.trim() !== "" ? inputNombre.value.trim() : valNombreClean;
+        const nuevaRaza = inputRaza.value.trim() !== "" ? inputRaza.value.trim() : valRazaClean;
         const nuevaSalud = selectSalud.value;
-        const nuevaObs = inputObs.value.trim();
+        const nuevaObs = inputObs.value.trim() !== "" ? inputObs.value.trim() : valObsClean;
 
         modal.style.display = 'none';
 
@@ -161,6 +195,8 @@ function editarAnimal(arete, nombre, saludActual, obsActual) {
                 body: JSON.stringify({
                     accion: "editar",
                     arete: arete,
+                    nombre: nuevoNombre,
+                    raza: nuevaRaza,
                     estadoSalud: nuevaSalud,
                     observaciones: nuevaObs
                 })
@@ -177,52 +213,60 @@ function editarAnimal(arete, nombre, saludActual, obsActual) {
     };
 }
 
-    // 4. Función para Eliminar Animal
-    async function eliminarAnimal(arete, nombre) {
-        const confirmacion = confirm(`¿Estás seguro de que deseas eliminar al animal "${nombre}" con Arete: ${arete}? Esta acción lo borrará también de la base de datos.`);
-        
-        if (!confirmacion) return;
+// 4. Función para Eliminar Animal
+async function eliminarAnimal(arete, nombre) {
+    const confirmacion = confirm(`¿Estás seguro de que deseas eliminar al animal "${nombre}" con Arete: ${arete}? Esta acción lo borrará también de la base de datos.`);
+    
+    if (!confirmacion) return;
 
-        try {
-            tablaCuerpo.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:20px;">⏳ Eliminando registro de Google Sheets...</td></tr>`;
+    try {
+        tablaCuerpo.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:20px;">⏳ Eliminando registro de Google Sheets...</td></tr>`;
 
-            await fetch(URL_WEB_APP, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ accion: "eliminar", arete: arete })
-            });
-
-            alert(`✅ El animal con Arete ${arete} fue eliminado correctamente.`);
-            cargarDatosGoogleSheets();
-
-        } catch (error) {
-            console.error("Error al eliminar:", error);
-            alert("❌ Hubo un error al intentar eliminar el registro.");
-            cargarDatosGoogleSheets();
-        }
-    }
-
-    // 5. Actualizar Contadores Superiores
-    function actualizarMetricas(lista) {
-        if (elemTotal) elemTotal.textContent = lista.length;
-        if (elemHembras) elemHembras.textContent = lista.filter(a => a.sexo === 'Hembra').length;
-        if (elemMachos) elemMachos.textContent = lista.filter(a => a.sexo === 'Macho').length;
-    }
-
-    // 6. Buscador en Tiempo Real por Arete o Nombre
-    if (inputBusqueda) {
-        inputBusqueda.addEventListener('input', (e) => {
-            const texto = e.target.value.toLowerCase().trim();
-            listaFiltrada = listaAnimalesBase.filter(animal => {
-                const areteTexto = String(animal.arete || '').toLowerCase();
-                const nombreTexto = String(animal.nombre || '').toLowerCase();
-                return areteTexto.includes(texto) || nombreTexto.includes(texto);
-            });
-            renderizarTabla(listaFiltrada);
+        await fetch(URL_WEB_APP, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ accion: "eliminar", arete: arete })
         });
-    }
 
+        alert(`✅ El animal con Arete ${arete} fue eliminado correctamente.`);
+        cargarDatosGoogleSheets();
+
+    } catch (error) {
+        console.error("Error al eliminar:", error);
+        alert("❌ Hubo un error al intentar eliminar el registro.");
+        cargarDatosGoogleSheets();
+    }
+}
+
+// 5. Actualizar Contadores Superiores
+function actualizarMetricas(lista) {
+    if (elemTotal) elemTotal.textContent = lista.length;
+    if (elemHembras) elemHembras.textContent = lista.filter(a => a.sexo === 'Hembra').length;
+    if (elemMachos) elemMachos.textContent = lista.filter(a => a.sexo === 'Macho').length;
+}
+
+// 6. Buscador en Tiempo Real por Arete, Nombre, Raza o Salud
+if (inputBusqueda) {
+    inputBusqueda.addEventListener('input', (e) => {
+        const texto = e.target.value.toLowerCase().trim();
+        
+        animalesFiltradosGlobal = datosOriginales.filter(animal => {
+            const areteTexto = String(animal.arete || '').toLowerCase();
+            const nombreTexto = String(animal.nombre || '').toLowerCase();
+            const razaTexto = String(animal.raza || '').toLowerCase();
+            const saludTexto = String(animal.estadoSalud || '').toLowerCase();
+            
+            return areteTexto.includes(texto) || 
+                   nombreTexto.includes(texto) || 
+                   razaTexto.includes(texto) || 
+                   saludTexto.includes(texto);
+        });
+        
+        paginaActual = 1;
+        renderizarTablaPaginada();
+    });
+}
     // 7. EXPORTAR A EXCEL
     if (btnExcel) {
         btnExcel.addEventListener('click', () => {
@@ -349,6 +393,56 @@ function editarAnimal(arete, nombre, saludActual, obsActual) {
         });
     }
 
-    // Cargar datos iniciales
-    cargarDatosGoogleSheets();
+
+// 1. Función de Paginación
+function actualizarControlesPaginacion(inicio, fin, total, totalPaginas) {
+    const elInicio = document.getElementById("info-inicio");
+    const elFin = document.getElementById("info-fin");
+    const elTotal = document.getElementById("info-total");
+    const elTextoPag = document.getElementById("texto-pagina");
+
+    if (elInicio) elInicio.textContent = inicio;
+    if (elFin) elFin.textContent = fin;
+    if (elTotal) elTotal.textContent = total;
+    if (elTextoPag) elTextoPag.textContent = `Página ${paginaActual} de ${totalPaginas || 1}`;
+
+    const btnPrev = document.getElementById("btn-prev-pag");
+    const btnNext = document.getElementById("btn-next-pag");
+
+    if (btnPrev && btnNext) {
+        btnPrev.disabled = paginaActual <= 1;
+        btnNext.disabled = paginaActual >= totalPaginas || totalPaginas === 0;
+
+        btnPrev.style.opacity = btnPrev.disabled ? "0.5" : "1";
+        btnNext.style.opacity = btnNext.disabled ? "0.5" : "1";
+        btnPrev.style.cursor = btnPrev.disabled ? "not-allowed" : "pointer";
+        btnNext.style.cursor = btnNext.disabled ? "not-allowed" : "pointer";
+    }
+}
+
+// 2. Listeners de los botones Anterior / Siguiente
+const btnPrevPag = document.getElementById("btn-prev-pag");
+const btnNextPag = document.getElementById("btn-next-pag");
+
+if (btnPrevPag) {
+    btnPrevPag.addEventListener("click", () => {
+        if (paginaActual > 1) {
+            paginaActual--;
+            renderizarTablaPaginada();
+        }
+    });
+}
+
+if (btnNextPag) {
+    btnNextPag.addEventListener("click", () => {
+        const totalPaginas = Math.ceil(animalesFiltradosGlobal.length / REGISTROS_POR_PAGINA);
+        if (paginaActual < totalPaginas) {
+            paginaActual++;
+            renderizarTablaPaginada();
+        }
+    });
+}
+
+// 3. Cargar datos iniciales
+cargarDatosGoogleSheets();
 });
