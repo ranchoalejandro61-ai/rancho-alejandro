@@ -104,6 +104,17 @@
                             <!-- Los datos se inyectarán mediante JS -->
                         </tbody>
                     </table>
+                    <!-- Controles de Paginación -->
+<div class="contenedor-paginacion" style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding: 10px; background: #f9fafb; border-radius: 6px; border: 1px solid #e5e7eb;">
+    <div style="font-size: 0.9rem; color: #4b5563;">
+        Mostrando <span id="info-inicio" style="font-weight: bold;">0</span> - <span id="info-fin" style="font-weight: bold;">0</span> de <span id="info-total" style="font-weight: bold;">0</span> registros
+    </div>
+    <div style="display: flex; gap: 8px; align-items: center;">
+        <button id="btn-prev-pag" style="padding: 6px 12px; border: 1px solid #d1d5db; background: #fff; border-radius: 4px; cursor: pointer;">← Anterior</button>
+        <span id="texto-pagina" style="font-size: 0.9rem; font-weight: bold; color: #374151;">Página 1 de 1</span>
+        <button id="btn-next-pag" style="padding: 6px 12px; border: 1px solid #d1d5db; background: #fff; border-radius: 4px; cursor: pointer;">Siguiente →</button>
+    </div>
+</div>
                 </div>
                 <div id="mensaje-sin-resultados" class="sin-resultados" style="display: none;">
                     No se encontraron animales con el criterio de búsqueda.
@@ -115,12 +126,25 @@
     <!-- Modal de Edición -->
 <div id="modal-editar" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
     <div style="background: #fff; padding: 25px; border-radius: 8px; max-width: 450px; width: 90%; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-        <h3 style="margin-top: 0; color: #2a4d33;">Editar Registro</h3>
-        <p id="modal-info-animal" style="font-size: 14px; color: #555; margin-bottom: 15px;"></p>
+        <h3 style="margin-top: 0; color: #2a4d33;">✏️ Editar Registro</h3>
+        <p id="modal-info-animal" style="font-size: 14px; color: #555; margin-bottom: 15px; font-weight: bold;"></p>
         
+        <!-- Campo Nombre -->
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px;">Nombre del Animal:</label>
+            <input type="text" id="modal-nombre" placeholder="Ej. Muñeca, Pintada..." style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box;">
+        </div>
+
+        <!-- Campo Raza -->
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px;">Raza:</label>
+            <input type="text" id="modal-raza" placeholder="Ej. Brahman, Girolando..." style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box;">
+        </div>
+
+        <!-- Campo Estado de Salud -->
         <div style="margin-bottom: 15px;">
             <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px;">Estado de Salud:</label>
-            <select id="modal-salud" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+            <select id="modal-salud" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box;">
                 <option value="Excelente">Excelente</option>
                 <option value="Bueno">Bueno</option>
                 <option value="Regular">Regular</option>
@@ -129,11 +153,13 @@
             </select>
         </div>
 
+        <!-- Campo Observaciones -->
         <div style="margin-bottom: 20px;">
             <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px;">Observaciones:</label>
-            <textarea id="modal-observaciones" rows="3" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; resize: vertical;"></textarea>
+            <textarea id="modal-observaciones" rows="3" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; resize: vertical; box-sizing: border-box;"></textarea>
         </div>
 
+        <!-- Botones de Acción -->
         <div style="text-align: right; gap: 10px; display: flex; justify-content: flex-end;">
             <button id="btn-cancelar-modal" style="padding: 8px 16px; background: #6b7280; color: white; border: none; border-radius: 4px; cursor: pointer;">Cancelar</button>
             <button id="btn-guardar-modal" style="padding: 8px 16px; background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Guardar Cambios</button>

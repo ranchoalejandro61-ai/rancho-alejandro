@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventos y Tareas - Rancho</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐄</text></svg>">
+    
+    <!-- Carga de variables globales y de estilos específicos -->
+    
+    <link rel="stylesheet" href="css/eventos.css">
+    <link rel="stylesheet" href="css/global.css">
+    
+
+</head>
+<body>
+
+    <div class="contenedor-principal">
+        
+        <!-- Sidebar lateral -->
+        <aside class="sidebar">
+            <div class="banner-contenedor">
+                <img src="assets/logo.png" alt="Registro de Ganado - Rancho Alejandro" class="imagen-banner" onerror="this.src='https://via.placeholder.com/280x600?text=RANCHO+ALEJANDRO'">
+            </div>
+
+            <footer class="sidebar-footer">
+                <p>🛡️ Sistema de Control Ganadero - Rancho Alejandro</p>
+            </footer>
+        </aside>
+        
+        <!-- Contenido principal derecho -->
+        <main class="contenido">
+            
+            <!-- Barra superior con botón volver -->
+            <div class="top-bar">
+                <a href="index.html" class="btn-volver">← Volver al Menú Principal</a>
+            </div>
+
+            <!-- Tarjeta del Formulario -->
+            <section class="tarjeta-formulario">
+                <div class="encabezado-seccion">
+                    <span class="icono-encabezado">📌</span>
+                    <h2>REGISTRAR NUEVO EVENTO O NOTA</h2>
+                </div>
+
+                <form id="form-evento">
+                    <div class="grid-formulario">
+                        <div class="campo-grupo campo-completo">
+                            <label for="titulo">Título de la actividad / nota:</label>
+                            <input type="text" id="titulo" placeholder="Ej. Fumigación a todo el hato, Limpieza de canoas..." required>
+                        </div>
+
+                        <div class="campo-grupo">
+                            <label for="fecha">Fecha:</label>
+                            <input type="date" id="fecha" required>
+                        </div>
+
+                        <div class="campo-grupo">
+                            <label for="estado">Estado:</label>
+                            <select id="estado">
+                                <option value="Pendiente">⏳ Pendiente</option>
+                                <option value="En Proceso">🔄 En Proceso</option>
+                                <option value="Completado">✅ Completado</option>
+                            </select>
+                        </div>
+
+                        <div class="campo-grupo campo-completo">
+                            <label for="detalles">Detalles u observaciones:</label>
+                            <textarea id="detalles" rows="3" placeholder="Escribe notas adicionales (ej. insumos usados, personal a cargo...)"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="contenedor-botones">
+                        <button type="submit" id="btn-guardar-evt" class="btn-guardar">💾 Guardar Evento</button>
+                        <button type="reset" class="btn-limpiar">🧹 Limpiar Formulario</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Sección de Eventos Registrados -->
+            <section class="seccion-eventos" style="margin-top: 30px;">
+                <div class="encabezado-seccion">
+                    <span class="icono-encabezado">📋</span>
+                    <h2>TAREAS Y NOTAS REGISTRADAS</h2>
+                </div>
+                
+                <div id="contenedor-eventos" class="grid-eventos">
+                    <p style="text-align: center; color: #777; font-style: italic; grid-column: 1 / -1;">Cargando eventos registrados...</p>
+                </div>
+            </section>
+
+        </main>
+
+    </div>
+
+    <!-- Script de lógica de eventos -->
+    <script src="js/eventos.js"></script>
+</body>
+</html>
